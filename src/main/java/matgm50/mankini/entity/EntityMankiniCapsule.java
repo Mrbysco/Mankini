@@ -8,6 +8,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
@@ -19,32 +20,37 @@ public class EntityMankiniCapsule extends EntityThrowable {
 
     ItemStack foundMankini;
 
-    ItemStack kini = new ItemStack(ModItems.itemDyeableMankini);
-    public EntityMankiniCapsule(World par1World) {
+    ItemStack kini = new ItemStack(ModItems.dyeable_mankini);
+    public EntityMankiniCapsule(World worldIn) {
 
-        super(par1World);
+        super(worldIn);
 
     }
 
-    public EntityMankiniCapsule(World par1World, EntityLivingBase par2EntityLivingBase, ItemStack foundMankini) {
+    public EntityMankiniCapsule(World worldIn, EntityLivingBase throwerIn, ItemStack foundMankini) {
 
-        super(par1World, par2EntityLivingBase);
+        super(worldIn, throwerIn);
         this.foundMankini = foundMankini;
 
     }
 
-    public EntityMankiniCapsule(World par1World, double par2, double par4, double par6) {
+    public EntityMankiniCapsule(World worldIn, double x, double y, double z) {
 
-        super(par1World, par2, par4, par6);
+        super(worldIn, x, y, z);
 
     }
 
-   @Override
-    protected void onImpact(RayTraceResult mop) {
-	   
-        if(mop.typeOfHit != null && mop.typeOfHit == RayTraceResult.Type.ENTITY) {
+    public static void registerFixesMankiniCapsule(DataFixer fixer)
+    {
+        EntityThrowable.registerFixesThrowable(fixer, "MankiniCapsule");
+    }
 
-            Entity hit = mop.entityHit;
+   @Override
+    protected void onImpact(RayTraceResult result) {
+	   
+        if(result.typeOfHit != null && result.typeOfHit == RayTraceResult.Type.ENTITY) {
+
+            Entity hit = result.entityHit;
            
             if(hit instanceof EntityPlayer) {
             	setDead();
@@ -54,7 +60,7 @@ public class EntityMankiniCapsule extends EntityThrowable {
                 
                     
                            
-                if(!this.worldObj.isRemote) {
+                if(!this.world.isRemote) {
                 	
                 	for (int i=0; i<=3; i++) {
                     	
@@ -79,11 +85,11 @@ public class EntityMankiniCapsule extends EntityThrowable {
     }
             setDead();
         }
-        if(!this.worldObj.isRemote) {
-      	  if (mop.typeOfHit != null && mop.typeOfHit == RayTraceResult.Type.BLOCK)
+        if(!this.world.isRemote) {
+      	  if (result.typeOfHit != null && result.typeOfHit == RayTraceResult.Type.BLOCK)
       {
          setDead();
-         int kiniDrop = Item.getIdFromItem(ModItems.itemDyeableMankini);
+         int kiniDrop = Item.getIdFromItem(ModItems.dyeable_mankini);
          this.dropItem(Item.getItemById(kiniDrop), 1);
       }
       }

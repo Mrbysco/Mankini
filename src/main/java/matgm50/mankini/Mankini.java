@@ -42,17 +42,18 @@ public class Mankini {
         ModItems.register();
         
         ModRecipes.init();
-        proxy.RegisterRenders();
 
         ModEntities.init();
 
         TickHandler.init();
-
-        proxy.initRenderers();
         
         BatHandler.init();
         
         BatMankiniJump.init();
+        
+        proxy.RegisterRenders();
+        
+        proxy.initRenderers();
       
     }
 

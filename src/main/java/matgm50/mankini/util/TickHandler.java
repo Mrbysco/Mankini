@@ -28,12 +28,12 @@ public class TickHandler {
 
         if(armor != null) {
 
-            if(armor.getItem() == ModItems.itemAethericMankini) {
+            if(armor.getItem() == ModItems.aetheric_mankini) {
 
                 player.capabilities.allowFlying = true;
 
             }
-            else if (armor.getItem() == ModItems.itemBatMankini) {
+            else if (armor.getItem() == ModItems.bat_mankini) {
 
                player.fallDistance = 0F;
 

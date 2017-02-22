@@ -25,8 +25,6 @@ public class ItemBatMankini extends ItemArmor implements IMankini {
 		setRegistryName(ItemLib.ModItems.MANKINI_BAT_NAME.getRegistryName());
         setCreativeTab(Mankini.tabMankini);
         setMaxStackSize(1);
-        GameRegistry.register(this);
-
     }
 
     @SubscribeEvent
@@ -37,7 +35,7 @@ public class ItemBatMankini extends ItemArmor implements IMankini {
     		EntityPlayer player = (EntityPlayer) event.getEntityLiving();
     		if(!player.isSneaking()){
 			if (player.inventory.armorItemInSlot(2) != null){
-				if(player.inventory.armorItemInSlot(2).getItem()== ModItems.itemBatMankini){
+				if(player.inventory.armorItemInSlot(2).getItem()== ModItems.bat_mankini){
 				player.motionY += 1.1F;
 				player.addPotionEffect((new PotionEffect(MobEffects.SLOWNESS, 200, 1)));
 				}

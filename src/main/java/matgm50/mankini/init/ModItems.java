@@ -21,66 +21,60 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModItems {
 
-    public static Item itemDyeableMankini;
-    public static Item itemKawaiiMankini;
-    public static Item itemAethericMankini;
-    public static Item itemMankiniCannon;
-    public static Item itemMankiniCapsule;
-    public static Item itemBatMankini;
+    public static Item dyeable_mankini;
+    public static Item kawaii_mankini;
+    public static Item aetheric_mankini;
+    public static Item mankini_cannon;
+    public static Item mankini_capsule;
+    public static Item bat_mankini;
 
     public static void init() {
 
-        itemDyeableMankini = new ItemDyeableMankini();
-        itemKawaiiMankini = new ItemKawaiiMankini();
-        itemAethericMankini = new ItemAAMT();
-        itemMankiniCannon  = new ItemMankiniCannon();
-        itemMankiniCapsule = new ItemMankiniCapsule();
-        itemBatMankini = new ItemBatMankini();
+    	dyeable_mankini = new ItemDyeableMankini();
+        kawaii_mankini = new ItemKawaiiMankini();
+        aetheric_mankini = new ItemAAMT();
+        mankini_cannon  = new ItemMankiniCannon();
+        mankini_capsule = new ItemMankiniCapsule();
+        bat_mankini = new ItemBatMankini();
     	}
 
     public static void register()
     {
-    	GameRegistry.register(itemDyeableMankini);
-    	GameRegistry.register(itemKawaiiMankini);
-    	GameRegistry.register(itemAethericMankini);
-    	GameRegistry.register(itemMankiniCannon);
-    	GameRegistry.register(itemMankiniCapsule);
-    	GameRegistry.register(itemBatMankini);
+    	GameRegistry.register(dyeable_mankini);
+    	GameRegistry.register(kawaii_mankini);
+    	GameRegistry.register(aetheric_mankini);
+    	GameRegistry.register(mankini_cannon);
+    	GameRegistry.register(mankini_capsule);
+    	GameRegistry.register(bat_mankini);
     }
-       // GameRegistry.registerItem(itemDyeableMankini, ItemLib.DYEABLE_MAKNINI_NAME);
-       // GameRegistry.registerItem(itemKawaiiMankini, ItemLib.KAWAII_MAKNINI_NAME);
-       // GameRegistry.registerItem(itemAethericMankini, ItemLib.AETHERIC_MAKNINI_NAME);
-       // GameRegistry.registerItem(itemMankiniCannon, ItemLib.MANKINI_CANNON_NAME);
-       //  GameRegistry.registerItem(itemMankiniCapsule, ItemLib.MANKINI_CAPSULE_NAME);
-      //  GameRegistry.registerItem(itemBatMankini, ItemLib.MANKINI_BAT_NAME);
-
-        public static void registerRenders()
-    	{
-    		registerRender(itemDyeableMankini);
-    		registerRender(itemKawaiiMankini);
-    		registerRender(itemAethericMankini);
-    		registerRender(itemMankiniCannon);
-    		registerRender(itemMankiniCapsule);
-    		registerRender(itemBatMankini);
-    	}
-        
-        public static void registerColorRenders()
-        {
-        	Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new IItemColor() {
-                @Override
-                public int getColorFromItemstack(ItemStack stack, int tintIndex) {
-                     NBTTagCompound tag = stack.getTagCompound();
-                     if(tag!=null){
-                         NBTTagCompound nbt = tag.getCompoundTag("display");
-                        return nbt == null ? 10511680 : (nbt.hasKey("color", 3) ? nbt.getInteger("color") : 10511680);
-                     }
-                     return 10511680;
-                }
-            }, itemDyeableMankini);
-        }
-    	
-        public static void registerRender(Item item)
-    	{
-    		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
-    	}
+    
+    public static void registerRenders()
+	{
+		registerRender(dyeable_mankini);
+		registerRender(kawaii_mankini);
+		registerRender(aetheric_mankini);
+		registerRender(mankini_cannon);
+		registerRender(mankini_capsule);
+		registerRender(bat_mankini);
+	}
+    
+    public static void registerColorRenders()
+    {
+    	Minecraft.getMinecraft().getItemColors().registerItemColorHandler(new IItemColor() {
+            @Override
+            public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+                 NBTTagCompound tag = stack.getTagCompound();
+                 if(tag!=null){
+                     NBTTagCompound nbt = tag.getCompoundTag("display");
+                    return nbt == null ? 10511680 : (nbt.hasKey("color", 3) ? nbt.getInteger("color") : 10511680);
+                 }
+                 return 10511680;
+            }
+        }, dyeable_mankini);
+    }
+	
+    public static void registerRender(Item item)
+	{
+		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
+	}
 }

@@ -21,8 +21,6 @@ public class ItemMankiniCapsule extends Item {
 		setRegistryName(ItemLib.ModItems.MANKINI_CAPSULE_NAME.getRegistryName());
         setCreativeTab(Mankini.tabMankini);
         setMaxStackSize(1);
-        GameRegistry.register(this);
-
     }
 
     public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer) {

@@ -3,6 +3,8 @@ package matgm50.mankini.entity;
 import java.util.Random;
 
 import matgm50.mankini.Mankini;
+import matgm50.mankini.init.ModEntityNames;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 /**
@@ -11,7 +13,7 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 public class ModEntities {
 	
-	public static void registerEntity(Class entityClass, String name)
+	public static void registerEntity(Class entityClass, String name, ResourceLocation registry)
     {
     int entityID = 0;
     long seed = name.hashCode();
@@ -20,13 +22,14 @@ public class ModEntities {
     int secondaryColor = rand.nextInt() * 16777215;
 
     //EntityRegistry.registerGlobalEntityID(entityClass, name, entityID);
-    EntityRegistry.registerModEntity(entityClass, name, entityID, Mankini.instance, 64, 1, true);
+    EntityRegistry.registerModEntity(registry, entityClass, name, entityID, Mankini.instance, 64, 1, true);
    // EntityList.entityEggs.put(Integer.valueOf(entityID), new EntityList.EntityEggInfo(entityID, primaryColor, secondaryColor));
     }
 
     public static void init() {
 
-        EntityRegistry.registerModEntity(EntityMankiniCapsule.class, "MankiniCapsule", 0, Mankini.instance, 64, 10, true);
+        EntityRegistry.registerModEntity(ModEntityNames.MANKINI_CAPSULE_REGISTRY, EntityMankiniCapsule.class, ModEntityNames.MANKINI_CAPSULE, 0, Mankini.instance, 64, 10, true);
+
         
         //registerEntity(EntityMankiniWither.class, "Mankini Wither");
         

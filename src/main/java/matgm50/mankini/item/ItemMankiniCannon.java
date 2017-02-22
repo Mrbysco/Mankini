@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemArrow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
@@ -36,11 +37,11 @@ public class ItemMankiniCannon extends Item {
         setCreativeTab(Mankini.tabMankini);
         setMaxStackSize(1);
         setFull3D();
-        GameRegistry.register(this);
-        
     }
 
-    public ActionResult<ItemStack> onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) 
+    {
+    	ItemStack itemstack = playerIn.getHeldItem(handIn);
           //  --itemStackIn.stackSize;
         worldIn.playSound((EntityPlayer)null, playerIn.posX, playerIn.posY, playerIn.posZ, SoundEvents.ENTITY_SNOWBALL_THROW, SoundCategory.NEUTRAL, 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
        
@@ -49,12 +50,12 @@ public class ItemMankiniCannon extends Item {
             	
             	  if (!playerIn.capabilities.isCreativeMode)
                   {	
-            playerIn.inventory.removeStackFromSlot(MankiniHelper.mankiniSlot(playerIn));
+            		  playerIn.inventory.removeStackFromSlot(MankiniHelper.mankiniSlot(playerIn));
                   }
             	  
-            EntityMankiniCapsule entitymankinicapsule = new EntityMankiniCapsule(worldIn, playerIn, MankiniHelper.getFirstFoundMankini(playerIn));
-            entitymankinicapsule.setHeadingFromThrower(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0.0F, 1.5F, 1.0F);
-            worldIn.spawnEntityInWorld(entitymankinicapsule);
+            EntityMankiniCapsule mankinicapsule = new EntityMankiniCapsule(worldIn, playerIn, MankiniHelper.getFirstFoundMankini(playerIn));
+            mankinicapsule.setHeadingFromThrower(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0.0F, 1.5F, 1.0F);
+            worldIn.spawnEntity(mankinicapsule);
             shotFired = true;
             //par2World.spawnEntityInWo+++rld(new EntityMankiniCapsule(par2World, par3EntityPlayer, MankiniHelper.getFirstFoundMankini(par3EntityPlayer)));
             }
@@ -67,11 +68,12 @@ public class ItemMankiniCannon extends Item {
         playerIn.inventory.markDirty();
         }
         if(shotFired = true){
-        return new ActionResult(EnumActionResult.SUCCESS, itemStackIn);
+        return new ActionResult(EnumActionResult.SUCCESS, itemstack);
         }
-        else return new ActionResult(EnumActionResult.FAIL, itemStackIn);
+        else return new ActionResult(EnumActionResult.FAIL, itemstack);
  
     }
+
     @SideOnly(Side.CLIENT)
     public void initModel() {
         ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));

@@ -5,8 +5,10 @@ import matgm50.mankini.lib.ItemLib;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 /**
  * Created by MasterAbdoTGM50 on 7/2/2014.
@@ -23,9 +25,11 @@ public class ItemMankiniCapsule extends Item {
         setMaxStackSize(1);
     }
 
-    public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn){
 
-        return par1ItemStack;
+	ItemStack itemstack = playerIn.getHeldItem(handIn);
+
+    return new ActionResult(EnumActionResult.SUCCESS, itemstack);
 
     }
 }

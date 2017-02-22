@@ -34,10 +34,9 @@ public class ItemMankiniCannon extends Item {
 		setRegistryName(ItemLib.ModItems.MANKINI_CANNON_NAME.getRegistryName());
         setCreativeTab(Mankini.tabMankini);
         setMaxStackSize(1);
-        setFull3D();
     }
 
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) 
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn)
     {
     	ItemStack itemstack = playerIn.getHeldItem(handIn);
           //  --itemStackIn.stackSize;
@@ -70,11 +69,6 @@ public class ItemMankiniCannon extends Item {
         }
         else return new ActionResult(EnumActionResult.FAIL, itemstack);
  
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void initModel() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, new ModelResourceLocation(getRegistryName(), "inventory"));
     }
 
 	public String getName() {

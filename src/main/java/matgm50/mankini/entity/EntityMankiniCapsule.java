@@ -53,7 +53,8 @@ public class EntityMankiniCapsule extends EntityThrowable {
             Entity hit = result.entityHit;
            
             if(hit instanceof EntityPlayer) {
-            	setDead();
+            	this.world.setEntityState(this, (byte)3);
+                this.setDead();
                 EntityPlayer hitPlayer = (EntityPlayer)hit;
                 Boolean full = true;
         
@@ -80,19 +81,23 @@ public class EntityMankiniCapsule extends EntityThrowable {
                     }
                     
                     
-        }
+                }
         
-    }
-            setDead();
+            }
+            this.world.setEntityState(this, (byte)3);
+            this.setDead();
         }
         if(!this.world.isRemote) {
       	  if (result.typeOfHit != null && result.typeOfHit == RayTraceResult.Type.BLOCK)
       {
-         setDead();
-         int kiniDrop = Item.getIdFromItem(ModItems.dyeable_mankini);
-         this.dropItem(Item.getItemById(kiniDrop), 1);
+  		this.world.setEntityState(this, (byte)3);
+		this.setDead();
+		int kiniDrop = Item.getIdFromItem(ModItems.dyeable_mankini);
+        this.dropItem(Item.getItemById(kiniDrop), 1);
       }
       }
-        else setDead();
+        else 
+        this.world.setEntityState(this, (byte)3);
+        this.setDead();
    }
 }

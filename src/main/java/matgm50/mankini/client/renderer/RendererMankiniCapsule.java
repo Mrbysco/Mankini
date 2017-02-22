@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.entity.RenderSnowball;
 public class RendererMankiniCapsule extends RenderSnowball<EntityMankiniCapsule> {
 
 	public RendererMankiniCapsule(RenderManager renderManagerIn, RenderItem renderItem) {
+		super(renderManagerIn, ModItems.mankini_cannon, renderItem);
 	}
 
 }

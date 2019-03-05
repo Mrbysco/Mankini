@@ -1,7 +1,5 @@
 package matgm50.mankini.init;
 
-import net.minecraft.init.Blocks;
-
 public class ModRecipes {
 	
     public static void init() {

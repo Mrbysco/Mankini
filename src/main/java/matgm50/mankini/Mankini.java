@@ -1,8 +1,5 @@
 package matgm50.mankini;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import matgm50.mankini.entity.hostile.EntityMankiniCreeper;
 import matgm50.mankini.init.ModConfigGen;
 import matgm50.mankini.init.ModCreativeTab;
@@ -25,6 +22,8 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(modid = ModLib.MOD_ID, name = ModLib.MOD_NAME, version = ModLib.VERSION, acceptedMinecraftVersions = ModLib.ACCEPTED_VERSIONS)
 
@@ -67,8 +66,6 @@ public class Mankini {
     	MinecraftForge.EVENT_BUS.register(new BatMankiniJump());
     	MinecraftForge.EVENT_BUS.register(new TickHandler());
     	MinecraftForge.EVENT_BUS.register(new DropHandler());
-    	
-    	proxy.RegisterColorRenders();
     }
 
     @EventHandler

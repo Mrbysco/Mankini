@@ -14,8 +14,4 @@ public class CommonProxy {
 
 	}
 
-	public void RegisterColorRenders() {
-		
-	}
-
 }

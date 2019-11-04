@@ -1,73 +1,46 @@
 package matgm50.mankini;
 
-import matgm50.mankini.init.ModConfigGen;
-import matgm50.mankini.init.ModEntities;
-import matgm50.mankini.init.ModItems;
-import matgm50.mankini.init.ModRecipes;
+import matgm50.mankini.client.ClientHandler;
+import matgm50.mankini.init.MankiniConfig;
+import matgm50.mankini.init.ModCreativeTab;
+import matgm50.mankini.init.ModSpawning;
 import matgm50.mankini.lib.ModLib;
-import matgm50.mankini.proxy.CommonProxy;
-import matgm50.mankini.util.BatHandler;
-import matgm50.mankini.util.BatMankiniJump;
-import matgm50.mankini.util.DropHandler;
-import matgm50.mankini.util.TabMankini;
-import matgm50.mankini.util.TickHandler;
-import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemGroup;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-/**
- * Created by MasterAbdoTGM50 on 4/23/2014.
- */
-
-@Mod(modid = ModLib.MOD_ID, name = ModLib.MOD_NAME, version = ModLib.VERSION, acceptedMinecraftVersions = ModLib.ACCEPTED_VERSIONS)
-
+@Mod(ModLib.MOD_ID)
 public class Mankini {
-
-    @Instance(ModLib.MOD_ID)
     public static Mankini instance;
 
-    @SidedProxy(clientSide = ModLib.CLIENTPROXY, serverSide = ModLib.COMMONPROXY)
-	public static CommonProxy proxy;
+	public static final Logger logger = LogManager.getLogger(ModLib.MOD_ID);
 
-    public static CreativeTabs tabMankini = new TabMankini(ModLib.MOD_ID);
-    
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
+    public static ItemGroup tabMankini = new ModCreativeTab(ModLib.MOD_ID);
 
-    	MinecraftForge.EVENT_BUS.register(new ModConfigGen());
-    	
-        ModItems.init();
-        ModItems.register();
-        
-        ModRecipes.init();
-        ModEntities.register();
-        proxy.RegisterRenders();
-        proxy.initMobRenderers();
-      
+	public Mankini() {
+		instance = this;
+
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, MankiniConfig.commonSpec);
+		FMLJavaModLoadingContext.get().getModEventBus().register(MankiniConfig.class);
+
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+
+		DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
+			MinecraftForge.EVENT_BUS.addListener(ClientHandler::registerRenders);
+			FMLJavaModLoadingContext.get().getModEventBus().addListener(ClientHandler::registerItemColors);
+		});
+	}
+
+	private void setup(final FMLCommonSetupEvent event)
+	{
+		ModSpawning.register();
     }
-
-    @EventHandler
-    public void init(FMLInitializationEvent event) {
-    	
-    	MinecraftForge.EVENT_BUS.register(new BatHandler());
-    	MinecraftForge.EVENT_BUS.register(new BatMankiniJump());
-    	MinecraftForge.EVENT_BUS.register(new TickHandler());
-    	MinecraftForge.EVENT_BUS.register(new DropHandler());
-    	
-    	proxy.RegisterColorRenders();
-    	
-    }
-
-    @EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-
-    }
-
-
 }

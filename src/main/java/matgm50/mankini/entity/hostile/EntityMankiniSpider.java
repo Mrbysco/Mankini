@@ -1,109 +1,177 @@
 package matgm50.mankini.entity.hostile;
 
-import javax.annotation.Nullable;
-
+import matgm50.mankini.entity.ai.EntityAIMankiniTarget;
+import matgm50.mankini.init.MankiniConfig;
+import matgm50.mankini.init.ModEntities;
 import matgm50.mankini.init.ModItems;
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.IEntityLivingData;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntitySpider;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ILivingEntityData;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.LeapAtTargetGoal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.ai.goal.LookRandomlyGoal;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
+import net.minecraft.entity.monster.SkeletonEntity;
+import net.minecraft.entity.monster.SpiderEntity;
+import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.datafix.DataFixer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.potion.Effects;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
-public class EntityMankiniSpider extends EntitySpider
-{
+import javax.annotation.Nullable;
+import java.util.Random;
+
+public class EntityMankiniSpider extends SpiderEntity {
+
+    public EntityMankiniSpider(EntityType<? extends EntityMankiniSpider> type, World worldIn) {
+        super(type, worldIn);
+    }
+
     public EntityMankiniSpider(World worldIn)
     {
-        super(worldIn);
+        super(ModEntities.MANKINI_SPIDER, worldIn);
     }
 
-    public static void registerFixesMankiniSpider(DataFixer fixer)
-    {
-        EntityLiving.registerFixesMob(fixer, "MankiniSpider");
-    }
-
-    protected SoundEvent getAmbientSound()
-    {
-        return SoundEvents.ENTITY_SPIDER_AMBIENT;
-    }
-
-    protected SoundEvent getHurtSound()
-    {
-        return SoundEvents.ENTITY_SPIDER_HURT;
-    }
-
-    protected SoundEvent getDeathSound()
-    {
-        return SoundEvents.ENTITY_SPIDER_DEATH;
-    }
-
-    protected void playStepSound(BlockPos pos, Block blockIn)
-    {
-        this.playSound(SoundEvents.ENTITY_SPIDER_STEP, 0.15F, 1.0F);
-    }
-
-    /**
-     * Called only once on an entity when first time spawned, via egg, mob spawner, natural spawning etc, but not called
-     * when entity is reloaded from nbt. Mainly used for initializing attributes and inventory
-     */
     @Override
-    @Nullable
-    public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, @Nullable IEntityLivingData livingdata)
-    {
-        livingdata = super.onInitialSpawn(difficulty, livingdata);
-    	ItemStack creeperKini = new ItemStack(ModItems.dyeable_mankini);
+    protected void registerGoals() {
+        this.goalSelector.addGoal(1, new SwimGoal(this));
+        this.goalSelector.addGoal(3, new LeapAtTargetGoal(this, 0.4F));
+        this.goalSelector.addGoal(4, new EntityMankiniSpider.AttackGoal(this));
+        this.goalSelector.addGoal(5, new WaterAvoidingRandomWalkingGoal(this, 0.8D));
+        this.goalSelector.addGoal(6, new LookAtGoal(this, PlayerEntity.class, 8.0F));
+        this.goalSelector.addGoal(6, new LookRandomlyGoal(this));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        this.targetSelector.addGoal(2, new EntityMankiniSpider.TargetGoal<>(this, PlayerEntity.class));
+        this.targetSelector.addGoal(3, new EntityMankiniSpider.TargetGoal<>(this, IronGolemEntity.class));
+    }
 
-        if (this.worldObj.rand.nextInt(100) == 0)
-        {
-            EntitySkeleton entityskeleton = new EntitySkeleton(this.worldObj);
+    @Nullable
+    @Override
+    public ILivingEntityData onInitialSpawn(IWorld worldIn, DifficultyInstance difficultyIn, SpawnReason reason, @Nullable ILivingEntityData spawnDataIn, @Nullable CompoundNBT dataTag) {
+        spawnDataIn = super.onInitialSpawn(worldIn, difficultyIn, reason, spawnDataIn, dataTag);
+        ItemStack creeperKini = new ItemStack(ModItems.dyeable_mankini);
+
+        if (this.world.rand.nextInt(100) == 0) {
+            MobEntity entityskeleton = new SkeletonEntity(EntityType.SKELETON, this.world);
+
+            if(this.world.rand.nextInt(20) < 5) {
+                entityskeleton = new EntityMankiniSkeleton(this.world);
+            }
+
             entityskeleton.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
-            entityskeleton.onInitialSpawn(difficulty, (IEntityLivingData)null);
-            this.worldObj.spawnEntityInWorld(entityskeleton);
-            entityskeleton.setItemStackToSlot(EntityEquipmentSlot.CHEST, creeperKini);
+            entityskeleton.onInitialSpawn(worldIn, difficultyIn, reason, (ILivingEntityData)null, (CompoundNBT) null);
+            entityskeleton.setItemStackToSlot(EquipmentSlotType.CHEST, creeperKini);
+            this.world.addEntity(entityskeleton);
             entityskeleton.startRiding(this);
         }
-        
-        else if (this.worldObj.rand.nextInt(100) < 10)
+        else if (this.world.rand.nextInt(100) < 10)
         {
-        	
-            EntityMankiniCreeper mankinicreeper = new EntityMankiniCreeper(this.worldObj);
+
+            EntityMankiniCreeper mankinicreeper = new EntityMankiniCreeper(this.world);
             mankinicreeper.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
-            mankinicreeper.onInitialSpawn(difficulty, (IEntityLivingData)null);
-            this.worldObj.spawnEntityInWorld(mankinicreeper);
-            mankinicreeper.setItemStackToSlot(EntityEquipmentSlot.CHEST, creeperKini);
+            mankinicreeper.onInitialSpawn(worldIn, difficultyIn, reason, (ILivingEntityData)null, (CompoundNBT) null);
+            mankinicreeper.setItemStackToSlot(EquipmentSlotType.CHEST, creeperKini);
+            this.world.addEntity(mankinicreeper);
             mankinicreeper.startRiding(this);
         }
 
-        if (livingdata == null)
-        {
-            livingdata = new EntityMankiniSpider.GroupData();
-
-            if (this.worldObj.getDifficulty() == EnumDifficulty.HARD && this.worldObj.rand.nextFloat() < 0.1F * difficulty.getClampedAdditionalDifficulty())
-            {
-                ((EntityMankiniSpider.GroupData)livingdata).setRandomEffect(this.worldObj.rand);
+        if (spawnDataIn == null) {
+            spawnDataIn = new SpiderEntity.GroupData();
+            if (this.world.getDifficulty() == Difficulty.HARD && this.world.rand.nextFloat() < 0.1F * difficultyIn.getClampedAdditionalDifficulty()) {
+                ((SpiderEntity.GroupData)spawnDataIn).setRandomEffect(this.world.rand);
             }
         }
 
-        if (livingdata instanceof EntityMankiniSpider.GroupData)
-        {
-            Potion potion = ((EntityMankiniSpider.GroupData)livingdata).effect;
-
-            if (potion != null)
-            {
-                this.addPotionEffect(new PotionEffect(potion, Integer.MAX_VALUE));
+        if (spawnDataIn instanceof SpiderEntity.GroupData) {
+            Effect potion = ((SpiderEntity.GroupData)spawnDataIn).effect;
+            if (potion != null) {
+                this.addPotionEffect(new EffectInstance(potion, Integer.MAX_VALUE));
             }
         }
 
-        return livingdata;
+        return spawnDataIn;
+    }
+
+    @Override
+    public boolean canSpawn(IWorld worldIn, SpawnReason reason) {
+        if(MankiniConfig.COMMON.MankiniSpiderSpawn.get())
+            return super.canSpawn(worldIn, reason);
+        else
+            return false;
+    }
+
+    static class AttackGoal extends MeleeAttackGoal {
+        public AttackGoal(SpiderEntity spider) {
+            super(spider, 1.0D, true);
+        }
+
+        /**
+         * Returns whether the EntityAIBase should begin execution.
+         */
+        public boolean shouldExecute() {
+            return super.shouldExecute() && !this.attacker.isBeingRidden();
+        }
+
+        /**
+         * Returns whether an in-progress EntityAIBase should continue executing
+         */
+        public boolean shouldContinueExecuting() {
+            float f = this.attacker.getBrightness();
+            if (f >= 0.5F && this.attacker.getRNG().nextInt(100) == 0) {
+                this.attacker.setAttackTarget((LivingEntity)null);
+                return false;
+            } else {
+                return super.shouldContinueExecuting();
+            }
+        }
+
+        protected double getAttackReachSqr(LivingEntity attackTarget) {
+            return (double)(4.0F + attackTarget.getWidth());
+        }
+    }
+
+    public static class GroupData implements ILivingEntityData {
+        public Effect effect;
+
+        public void setRandomEffect(Random rand) {
+            int i = rand.nextInt(5);
+            if (i <= 1) {
+                this.effect = Effects.SPEED;
+            } else if (i <= 2) {
+                this.effect = Effects.STRENGTH;
+            } else if (i <= 3) {
+                this.effect = Effects.REGENERATION;
+            } else if (i <= 4) {
+                this.effect = Effects.INVISIBILITY;
+            }
+
+        }
+    }
+
+    static class TargetGoal<T extends LivingEntity> extends EntityAIMankiniTarget<T> {
+        public TargetGoal(SpiderEntity spider, Class<T> classTarget) {
+            super(spider, classTarget, true);
+        }
+
+        /**
+         * Returns whether the EntityAIBase should begin execution.
+         */
+        public boolean shouldExecute() {
+            float f = this.goalOwner.getBrightness();
+            return f >= 0.5F ? false : super.shouldExecute();
+        }
     }
 }

@@ -1,62 +1,47 @@
 package matgm50.mankini.entity.hostile;
 
-import javax.annotation.Nullable;
-
-import net.minecraft.block.Block;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EnumCreatureAttribute;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
-import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAILookIdle;
-import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
-import net.minecraft.entity.ai.EntityAISwimming;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.entity.monster.EntityEndermite;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.datafix.DataFixer;
-import net.minecraft.util.math.BlockPos;
+import matgm50.mankini.entity.ai.EntityAIMankiniTarget;
+import matgm50.mankini.init.MankiniConfig;
+import matgm50.mankini.init.ModEntities;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.goal.HurtByTargetGoal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.ai.goal.LookRandomlyGoal;
+import net.minecraft.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.ai.goal.WaterAvoidingRandomWalkingGoal;
+import net.minecraft.entity.monster.EndermiteEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootTableList;
 
-public class EntityMankiniEndermite extends EntityEndermite
-{
-    private int lifetime;
-    private boolean playerSpawned;
+public class EntityMankiniEndermite extends EndermiteEntity {
 
-    public EntityMankiniEndermite(World worldIn)
-    {
-        super(worldIn);
+    public EntityMankiniEndermite(EntityType<? extends EntityMankiniEndermite> type, World worldIn) {
+        super(type, worldIn);
     }
 
-    protected SoundEvent getAmbientSound()
-    {
-        return SoundEvents.ENTITY_ENDERMITE_AMBIENT;
+    public EntityMankiniEndermite(World worldIn) {
+        super(ModEntities.MANKINI_ENDERMITE, worldIn);
     }
 
-    protected SoundEvent getHurtSound()
-    {
-        return SoundEvents.ENTITY_ENDERMITE_HURT;
+    @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(1, new SwimGoal(this));
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.0D, false));
+        this.goalSelector.addGoal(3, new WaterAvoidingRandomWalkingGoal(this, 1.0D));
+        this.goalSelector.addGoal(7, new LookAtGoal(this, PlayerEntity.class, 8.0F));
+        this.goalSelector.addGoal(8, new LookRandomlyGoal(this));
+        this.targetSelector.addGoal(1, (new HurtByTargetGoal(this)).setCallsForHelp());
+        this.targetSelector.addGoal(2, new EntityAIMankiniTarget<>(this, PlayerEntity.class, true));
     }
 
-    protected SoundEvent getDeathSound()
-    {
-        return SoundEvents.ENTITY_ENDERMITE_DEATH;
-    }
-
-    protected void playStepSound(BlockPos pos, Block blockIn)
-    {
-        this.playSound(SoundEvents.ENTITY_ENDERMITE_STEP, 0.15F, 1.0F);
-    }
-
-    public static void registerFixesMankiniEndermite(DataFixer fixer)
-    {
-        EntityLiving.registerFixesMob(fixer, "MankiniEndermite");
+    @Override
+    public boolean canSpawn(IWorld worldIn, SpawnReason reason) {
+        if(MankiniConfig.COMMON.MankiniEndermiteSpawn.get())
+            return super.canSpawn(worldIn, reason);
+        else
+            return false;
     }
 }

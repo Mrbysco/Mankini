@@ -1,52 +1,58 @@
 package matgm50.mankini.util;
 
-import matgm50.mankini.entity.hostile.EntityMankiniCreeper;
-import matgm50.mankini.entity.hostile.EntityMankiniEnderman;
-import matgm50.mankini.entity.hostile.EntityMankiniSpider;
+import matgm50.mankini.init.ModEffects;
 import matgm50.mankini.init.ModItems;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import matgm50.mankini.lib.ModLib;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import net.minecraft.potion.Effects;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 /**
  * Created by MasterAbdoTGM50 on 5/30/2014.
  */
-
+@Mod.EventBusSubscriber(modid = ModLib.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TickHandler {
 
     @SubscribeEvent
-    public void tick(PlayerTickEvent event) {
+    public static void playerTick(TickEvent.PlayerTickEvent event) {
+        PlayerEntity player = event.player;
+        boolean allowFlying = false;
 
-        EntityPlayer player = event.player;
-
-        ItemStack armor = player.inventory.armorItemInSlot(2);
+        ItemStack armor = player.getItemStackFromSlot(EquipmentSlotType.CHEST);
 
         if(armor != null) {
-
-            if(armor.getItem() == ModItems.aetheric_mankini) {
-
-                player.capabilities.allowFlying = true;
-
+            if (armor.getItem().equals(ModItems.wither_mankini)) {
+                if(player.getActivePotionEffects().contains(Effects.WITHER) || player.getActivePotionEffects().contains(ModEffects.MANKINI_WITHER)) {
+                    player.removePotionEffect(Effects.WITHER);
+                    player.removePotionEffect(ModEffects.MANKINI_WITHER);
+                }
             }
-            else if (armor.getItem() == ModItems.bat_mankini) {
-
-               player.fallDistance = 0F;
-
+            if (armor.getItem().equals(ModItems.bat_mankini)) {
+                player.fallDistance = 0F;
             }
 
-        } else {
-
-            if(!player.capabilities.isCreativeMode) {
-
-                player.capabilities.allowFlying = false;
-
+            if(armor.getItem().equals(ModItems.aetheric_mankini)) {
+            	allowFlying = true;
             }
-
+            else
+            {
+            	allowFlying = false;
+            }
+            
+            if (allowFlying && !player.isCreative()) { 
+				player.abilities.allowFlying = true;
+			}
+            else 
+            {
+            	if (player.abilities.allowFlying && !player.isCreative()) {
+		        	player.abilities.isFlying = false;
+		        	player.abilities.allowFlying = false;
+            	}
+            }
         }
-
     }
-    
 }

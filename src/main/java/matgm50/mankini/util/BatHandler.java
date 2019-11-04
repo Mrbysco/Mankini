@@ -1,47 +1,77 @@
 package matgm50.mankini.util;
 
 import matgm50.mankini.init.ModItems;
-import net.minecraft.entity.passive.EntityBat;
-import net.minecraft.entity.player.InventoryPlayer;
+import matgm50.mankini.lib.ModLib;
+import net.minecraft.entity.passive.BatEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
+@Mod.EventBusSubscriber(modid = ModLib.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class BatHandler {
-	public double batCount = 0;
-	double newBatCount = 0;
-
 
 	@SubscribeEvent
-	public void BatCapture(EntityInteract event)
+	public static void BatCapture(EntityInteract event)
 	{
-	InventoryPlayer inv = event.getEntityPlayer().inventory;
-	ItemStack currentItem = event.getEntityPlayer().inventory.getCurrentItem();
-	ItemStack BatMankini = new ItemStack(ModItems.bat_mankini);
-	ItemStack Mankini = new ItemStack(ModItems.dyeable_mankini);
-	
-	if(event.getTarget() instanceof EntityBat && event.getEntityPlayer().inventory.getCurrentItem().isItemEqual(Mankini) ){
-		{
-			
-			event.getTarget().setDead();
-	    
-			batCount = batCount+0.5;
-			setBatCount();
-		
-			if(batCount == 5.0F){
-				event.getEntityPlayer().setHeldItem(EnumHand.MAIN_HAND, null);
-				event.getEntityPlayer().inventory.addItemStackToInventory(BatMankini);	
-				batCount = 0F;
+		PlayerEntity player = event.getPlayer();
+		PlayerInventory inv = player.inventory;
+		ItemStack currentItem = player.inventory.getCurrentItem();
+		ItemStack BatMankini = new ItemStack(ModItems.bat_mankini);
+		ItemStack Mankini = new ItemStack(ModItems.dyeable_mankini);
+
+		if(event.getTarget() instanceof BatEntity && currentItem.isItemEqual(Mankini) ){
+			{
+				event.getTarget().remove();
+				CompoundNBT playerData = player.getPersistentData();
+				CompoundNBT data = getTag(playerData, PlayerEntity.PERSISTED_NBT_TAG);
+
+				incrementBatTag(player);
+				int batCount = data.getInt(ModLib.BAT_COUNT_TAG);
+
+				if(batCount == 8){
+					player.sendMessage(new TranslationTextComponent("mankini.bat.message"));
+					inv.removeStackFromSlot(inv.getSlotFor(Mankini));
+					inv.addItemStackToInventory(BatMankini);
+					setBatTag(player);
+				}
 			}
-			
 		}
 	}
-	
+
+	public static void incrementBatTag(PlayerEntity player){
+		CompoundNBT playerData = player.getPersistentData();
+		CompoundNBT data = getTag(playerData, PlayerEntity.PERSISTED_NBT_TAG);
+
+		if(data.contains(ModLib.BAT_COUNT_TAG))
+		{
+			int currentBat = data.getInt(ModLib.BAT_COUNT_TAG);
+			data.putInt(ModLib.BAT_COUNT_TAG, currentBat++);
+		}
+		else {
+			data.putInt(ModLib.BAT_COUNT_TAG, 1);
+		}
+
+		playerData.put(PlayerEntity.PERSISTED_NBT_TAG, data);
 	}
-	public void setBatCount(){
-		newBatCount = batCount;
+
+	public static void setBatTag(PlayerEntity player){
+		CompoundNBT playerData = player.getPersistentData();
+		CompoundNBT data = getTag(playerData, PlayerEntity.PERSISTED_NBT_TAG);
+
+		data.putInt(ModLib.BAT_COUNT_TAG, 0);
+
+		playerData.put(PlayerEntity.PERSISTED_NBT_TAG, data);
 	}
-	
-	
+
+	public static CompoundNBT getTag(CompoundNBT tag, String key) {
+		if(tag == null || !tag.contains(key)) {
+			return new CompoundNBT();
+		}
+		return tag.getCompound(key);
+	}
 }
